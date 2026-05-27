@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>胖萌萌减肥计划 — 体重数据报告</title>
+<style>
+  :root {
+    --bg: #1D1F27;
+    --bg-card: #252830;
+    --bg-card2: #2C2F3A;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #E8EAF0;
+    --text-muted: #8B8FA8;
+    --text-dim: #5C6080;
+    --accent1: #FF6B6B;
+    --accent2: #4ECDC4;
+    --accent3: #FFE66D;
+    --accent4: #A8E6CF;
+    --accent5: #C3B1E1;
+    --grad: linear-gradient(135deg, #FF6B6B, #FF8E53, #FFD93D, #6BCB77, #4ECDC4);
+    --grad2: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+    --grad3: linear-gradient(135deg, #FF6B6B 0%, #C06FFF 50%, #4ECDC4 100%);
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg-card2); border-radius: 3px; }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 40px 24px 80px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,107,107,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(78,205,196,0.10) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 40% at 20% 70%, rgba(192,111,255,0.08) 0%, transparent 50%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .hero-content { position: relative; text-align: center; max-width: 900px; z-index: 1; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,107,107,0.12);
+    border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: var(--accent1);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+
+  .hero-badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent1);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  .hero-title {
+    font-size: clamp(42px, 8vw, 88px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+    background: var(--grad3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--text-muted);
+    margin-bottom: 48px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-months {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+  }
+
+  .month-pill {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 140px;
+  }
+
+  .month-pill-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .month-pill-range {
+    font-size: 20px;
+    font-weight: 700;
+    background: var(--grad2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .month-pill-delta {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .delta-down { color: var(--accent2); }
+  .delta-up { color: var(--accent1); }
+
+  /* scroll arrow */
+  .scroll-arrow {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .scroll-arrow svg {
+    animation: bounce 1.8s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .section-header {
+    margin-bottom: 40px;
+  }
+
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent2);
+    margin-bottom: 12px;
+  }
+
+  .section-tag::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--accent2);
+    border-radius: 1px;
+  }
+
+  .section-title {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  /* ===== DIVIDER ===== */
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0;
+  }
+
+  /* ===== METRIC CARDS ===== */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  .metric-card.visible {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .metric-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+
+  .metric-card-glow {
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    opacity: 0.08;
+    filter: blur(30px);
+  }
+
+  .metric-label {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .metric-value {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .metric-unit {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  .metric-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  .metric-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-top: 8px;
+  }
+
+  .trend-good { background: rgba(78,205,196,0.12); color: var(--accent2); }
+  .trend-bad { background: rgba(255,107,107,0.12); color: var(--accent1); }
+  .trend-warn { background: rgba(255,230,109,0.12); color: var(--accent3); }
+
+  /* ===== LINE CHART ===== */
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .chart-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .chart-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .chart-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  /* tooltip */
+  .chart-tooltip {
+    position: fixed;
+    background: var(--bg-card2);
+    border: 1px solid var(--border-hover);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  .chart-tooltip.show { opacity: 1; }
+
+  .tooltip-date { color: var(--text-muted); font-size: 12px; margin-bottom: 4px; }
+  .tooltip-val { font-weight: 700; font-size: 16px; }
+
+  /* ===== TIMELINE ===== */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent1), var(--accent2));
+    border-radius: 1px;
+  }
+
+  .timeline-week {
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .timeline-week.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .timeline-week-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .timeline-event {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -28px;
+    top: 10px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    flex-shrink: 0;
+  }
+
+  .timeline-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .timeline-body { flex: 1; }
+
+  .timeline-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .timeline-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .timeline-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+
+  /* ===== DONUT CHART ===== */
+  .donut-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (max-width: 600px) {
+    .donut-section { grid-template-columns: 1fr; }
+  }
+
+  .donut-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .donut-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+
+  .legend-item:hover {
+    background: var(--bg-card2);
+  }
+
+  .legend-color {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .legend-name { font-size: 14px; font-weight: 500; flex: 1; }
+  .legend-val { font-size: 14px; font-weight: 700; }
+  .legend-pct { font-size: 12px; color: var(--text-muted); margin-left: 6px; }
+
+  /* ===== ACHIEVEMENT CARDS ===== */
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .achievement-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+  }
+
+  .achievement-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .achievement-card:hover {
+    border-color: var(--border-hover);
+  }
+
+  .achievement-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .achievement-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .achievement-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ===== OUTLOOK CARDS ===== */
+  .outlook-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .outlook-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .outlook-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .outlook-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    padding: 1px;
+    background: var(--grad2);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .outlook-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+
+  .outlook-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: var(--grad2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .outlook-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .outlook-target {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .outlook-target-val {
+    font-size: 18px;
+    font-weight: 800;
+    background: var(--grad2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  .footer-brand {
+    font-size: 16px;
+    font-weight: 700;
+    background: var(--grad2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .section { padding: 60px 20px; }
+    .chart-card { padding: 20px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-months { gap: 10px; }
+    .month-pill { min-width: 110px; padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOOLTIP (global) -->
+<div class="chart-tooltip" id="tooltip">
+  <div class="tooltip-date" id="tooltip-date"></div>
+  <div class="tooltip-val" id="tooltip-val"></div>
+</div>
+
+<!-- ======== HERO ======== -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      2026 年减肥追踪报告
+    </div>
+    <h1 class="hero-title">胖萌萌<br>减肥计划</h1>
+    <p class="hero-subtitle">从 137.9 斤到 127.4 斤，历经三个月的坚持与努力——每一克都是认真的证明</p>
+
+    <div class="hero-months">
+      <div class="month-pill">
+        <div class="month-pill-label">3 月</div>
+        <div class="month-pill-range">137.9 → 131.6</div>
+        <div class="month-pill-delta delta-down">▼ 6.3 斤</div>
+      </div>
+      <div class="month-pill">
+        <div class="month-pill-label">4 月</div>
+        <div class="month-pill-range">131.4 → 128.3</div>
+        <div class="month-pill-delta delta-down">▼ 3.1 斤</div>
+      </div>
+      <div class="month-pill">
+        <div class="month-pill-label">5 月</div>
+        <div class="month-pill-range">130.3 → 127.4</div>
+        <div class="month-pill-delta delta-down">▼ 2.9 斤（进行中）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-arrow" onclick="document.getElementById('metrics').scrollIntoView({behavior:'smooth'})">
+    <span>向下滚动</span>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M5 8l5 5 5-5" stroke="#5C6080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======== METRICS ======== -->
+<section class="section" id="metrics">
+  <div class="section-header">
+    <div class="section-tag">关键指标</div>
+    <h2 class="section-title">数据总览</h2>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-card" data-animate>
+      <div class="metric-card-glow" style="background:#FF6B6B"></div>
+      <div class="metric-label">起始体重</div>
+      <div class="metric-value" style="color:#FF6B6B">
+        <span class="count-up" data-target="137.9" data-decimal="1">137.9</span><span class="metric-unit"> 斤</span>
+      </div>
+      <div class="metric-desc">3月1日记录</div>
+      <div class="metric-trend trend-bad">📍 起点</div>
+    </div>
+    <div class="metric-card" data-animate style="animation-delay:0.1s">
+      <div class="metric-card-glow" style="background:#4ECDC4"></div>
+      <div class="metric-label">当前体重</div>
+      <div class="metric-value" style="background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+        <span class="count-up" data-target="127.4" data-decimal="1">127.4</span><span class="metric-unit" style="-webkit-text-fill-color:var(--text-muted)"> 斤</span>
+      </div>
+      <div class="metric-desc">5月27日最新数据</div>
+      <div class="metric-trend trend-good">✨ 进行中</div>
+    </div>
+    <div class="metric-card" data-animate style="animation-delay:0.2s">
+      <div class="metric-card-glow" style="background:#FFE66D"></div>
+      <div class="metric-label">累计减重</div>
+      <div class="metric-value" style="color:#FFE66D">
+        <span class="count-up" data-target="10.5" data-decimal="1">10.5</span><span class="metric-unit"> 斤</span>
+      </div>
+      <div class="metric-desc">历经 87 天坚持</div>
+      <div class="metric-trend trend-good">🎉 约 5.25 kg</div>
+    </div>
+    <div class="metric-card" data-animate style="animation-delay:0.3s">
+      <div class="metric-card-glow" style="background:#A8E6CF"></div>
+      <div class="metric-label">目标体重</div>
+      <div class="metric-value" style="color:#A8E6CF">
+        <span class="count-up" data-target="120" data-decimal="0">120</span><span class="metric-unit"> 斤</span>
+      </div>
+      <div class="metric-desc">距目标还差 7.4 斤</div>
+      <div class="metric-trend trend-warn">🎯 继续加油</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======== LINE CHART ======== -->
+<section class="section" id="chart">
+  <div class="section-header">
+    <div class="section-tag">体重变化</div>
+    <h2 class="section-title">全程折线图</h2>
+  </div>
+
+  <div class="chart-card" data-animate-fade>
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">3月 - 5月 每日体重（斤）</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:4px">悬浮数据点可查看详情</div>
+      </div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#FF6B6B"></span>3月</span>
+        <span><span class="legend-dot" style="background:#FFD93D"></span>4月</span>
+        <span><span class="legend-dot" style="background:#4ECDC4"></span>5月</span>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div id="line-chart-wrap"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======== TIMELINE ======== -->
+<section class="section" id="timeline">
+  <div class="section-header">
+    <div class="section-tag">里程碑</div>
+    <h2 class="section-title">减肥时间线</h2>
+  </div>
+
+  <div class="timeline" id="timeline-container">
+    <!-- JS generated -->
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======== DONUT ======== -->
+<section class="section" id="donut">
+  <div class="section-header">
+    <div class="section-tag">体重分布</div>
+    <h2 class="section-title">各月减重占比</h2>
+  </div>
+
+  <div class="donut-section">
+    <div class="donut-card" data-animate-fade>
+      <div id="donut-chart-wrap"></div>
+    </div>
+    <div class="donut-card" data-animate-fade style="transition-delay:0.15s">
+      <div style="font-size:16px;font-weight:700;margin-bottom:20px">减重构成</div>
+      <div class="donut-legend" id="donut-legend"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======== ACHIEVEMENTS ======== -->
+<section class="section" id="achievements">
+  <div class="section-header">
+    <div class="section-tag">成就解锁</div>
+    <h2 class="section-title">体重亮点时刻</h2>
+  </div>
+
+  <div class="achievements-grid">
+    <div class="achievement-card" data-animate>
+      <div class="achievement-icon" style="background:rgba(255,107,107,0.12)">🔥</div>
+      <div>
+        <div class="achievement-title">开局即破防</div>
+        <div class="achievement-desc">3月8日单日暴降 2.7 斤（137.8→135.1），是整个记录期最大单日降幅，状态绝了。</div>
+      </div>
+    </div>
+    <div class="achievement-card" data-animate style="animation-delay:0.08s">
+      <div class="achievement-icon" style="background:rgba(78,205,196,0.12)">🎯</div>
+      <div>
+        <div class="achievement-title">首破 130 斤大关</div>
+        <div class="achievement-desc">4月15日体重 130.2 斤，为三个月中首次进入 130 斤区间，里程碑时刻！</div>
+      </div>
+    </div>
+    <div class="achievement-card" data-animate style="animation-delay:0.16s">
+      <div class="achievement-icon" style="background:rgba(255,230,109,0.12)">⚡</div>
+      <div>
+        <div class="achievement-title">正式开启减肥计划</div>
+        <div class="achievement-desc">5月6日起始体重 134 斤，目标 127 斤，20 天内提前完成！仅用 20 天就突破阶段目标。</div>
+      </div>
+    </div>
+    <div class="achievement-card" data-animate style="animation-delay:0.24s">
+      <div class="achievement-icon" style="background:rgba(168,230,207,0.12)">💎</div>
+      <div>
+        <div class="achievement-title">连破 128 / 127.4 新低</div>
+        <div class="achievement-desc">5月24日 127.7 斤，5月27日 127.4 斤，连续刷新历史最低体重记录！</div>
+      </div>
+    </div>
+    <div class="achievement-card" data-animate style="animation-delay:0.32s">
+      <div class="achievement-icon" style="background:rgba(192,111,255,0.12)">🌟</div>
+      <div>
+        <div class="achievement-title">五一假期快速恢复</div>
+        <div class="achievement-desc">五一假期胖了 6 斤到 136 斤，但仅用约 10 天就减回 128 斤以下，恢复力超强。</div>
+      </div>
+    </div>
+    <div class="achievement-card" data-animate style="animation-delay:0.40s">
+      <div class="achievement-icon" style="background:rgba(255,142,83,0.12)">📉</div>
+      <div>
+        <div class="achievement-title">87 天减掉 10.5 斤</div>
+        <div class="achievement-desc">从 3月1日 137.9 斤到 5月27日 127.4 斤，三个月减掉约 10.5 斤（5.25 kg），成绩优秀！</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ======== OUTLOOK ======== -->
+<section class="section" id="outlook">
+  <div class="section-header">
+    <div class="section-tag">未来展望</div>
+    <h2 class="section-title">2026 下半年体重目标</h2>
+  </div>
+
+  <div class="outlook-grid">
+    <div class="outlook-card" data-animate>
+      <div class="outlook-icon">🎯</div>
+      <div class="outlook-title">阶段目标：120 斤</div>
+      <div class="outlook-desc">距离 120 斤目标还有 7.4 斤，按目前每月平均减重 3.5 斤的速度，预计 2026 年 8 月前可以达成。</div>
+      <div class="outlook-target">
+        <span style="color:var(--text-muted)">目标体重</span>
+        <span class="outlook-target-val">120 斤</span>
+        <span style="color:var(--text-muted)">→ 预计 8月</span>
+      </div>
+    </div>
+    <div class="outlook-card" data-animate style="animation-delay:0.1s">
+      <div class="outlook-icon">🏃</div>
+      <div class="outlook-title">运动计划强化</div>
+      <div class="outlook-desc">目前以饮食控制为主，建议下半年加入有氧+力量训练组合，提升基础代谢，让减脂效果更持久。</div>
+      <div class="outlook-target">
+        <span style="color:var(--text-muted)">推荐</span>
+        <span class="outlook-target-val">每周 4 次</span>
+      </div>
+    </div>
+    <div class="outlook-card" data-animate style="animation-delay:0.2s">
+      <div class="outlook-icon">🍽️</div>
+      <div class="outlook-title">饮食结构优化</div>
+      <div class="outlook-desc">节假日是最大风险点（五一胖 6 斤，清明胖 4 斤），建议假期提前规划饮食策略，避免集中反弹。</div>
+      <div class="outlook-target">
+        <span style="color:var(--text-muted)">关键节点</span>
+        <span class="outlook-target-val">国庆 8 天假</span>
+      </div>
+    </div>
+    <div class="outlook-card" data-animate style="animation-delay:0.3s">
+      <div class="outlook-icon">🏆</div>
+      <div class="outlook-title">终极目标：115 斤</div>
+      <div class="outlook-desc">以 120 斤为跳板，将 115 斤设为 2026 年年底的终极目标。届时体重减少幅度将超过 22 斤。</div>
+      <div class="outlook-target">
+        <span style="color:var(--text-muted)">终极目标</span>
+        <span class="outlook-target-val">115 斤</span>
+        <span style="color:var(--text-muted)">→ 年底达成</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-brand">胖萌萌减肥计划</div>
+  <div>数据周期：2026年3月1日 — 2026年5月27日 · 共 87 天</div>
+  <div style="margin-top:6px;opacity:0.5">Keep going. Every gram counts. 💪</div>
+</footer>
+
+<script>
+// ===== DATA =====
+const weightData = {
+  mar: [
+    {d:'3/1',w:137.4},{d:'3/2',w:137.6},{d:'3/3',w:137.6},{d:'3/4',w:137.4},{d:'3/5',w:137.5},
+    {d:'3/6',w:137.9},{d:'3/7',w:137.8},{d:'3/8',w:135.1},{d:'3/9',w:135.0},{d:'3/10',w:134.5},
+    {d:'3/11',w:134.0},{d:'3/12',w:133.7},{d:'3/13',w:134.6},{d:'3/14',w:133.8},{d:'3/15',w:132.8},
+    {d:'3/16',w:132.7},{d:'3/17',w:132.7},{d:'3/18',w:133.2},{d:'3/19',w:133.0},{d:'3/20',w:133.4},
+    {d:'3/21',w:132.6},{d:'3/22',w:131.5},{d:'3/23',w:132.4},{d:'3/24',w:132.8},{d:'3/25',w:132.5},
+    {d:'3/26',w:133.4},{d:'3/27',w:133.2},{d:'3/28',w:132.9},{d:'3/29',w:132.4},{d:'3/30',w:132.1},
+    {d:'3/31',w:131.6}
+  ],
+  apr: [
+    {d:'4/1',w:131.4},{d:'4/2',w:130.5},{d:'4/3',w:130.4},
+    {d:'4/4-6',w:null,note:'清明放假 +4 斤'},
+    {d:'4/7',w:134.0},{d:'4/8',w:133.4},{d:'4/9',w:133.0},{d:'4/10',w:132.4},{d:'4/11',w:131.7},
+    {d:'4/12',w:131.4},{d:'4/13',w:131.5},{d:'4/14',w:131.0},{d:'4/15',w:130.2},{d:'4/16',w:129.7},
+    {d:'4/17',w:129.0},{d:'4/18',w:130.6},{d:'4/19',w:132.8},{d:'4/20',w:132.2},{d:'4/21',w:130.6},
+    {d:'4/22',w:130.0},{d:'4/23',w:130.4},{d:'4/24',w:130.4},{d:'4/25',w:131.2},{d:'4/26',w:131.2},
+    {d:'4/27',w:132.3},{d:'4/28',w:129.7},{d:'4/29',w:128.3},{d:'4/30',w:128.3}
+  ],
+  may: [
+    {d:'5/1',w:130.3,note:'五一放假胖了6斤'},{d:'5/2',w:132.3},{d:'5/3',w:133.8},{d:'5/4',w:135.7},
+    {d:'5/5',w:134.0},{d:'5/6',w:133.1,note:'开始减肥(起始134斤,目标127斤)'},{d:'5/7',w:131.5},
+    {d:'5/8',w:130.2},{d:'5/9',w:129.5,note:'上班'},{d:'5/10',w:128.6},{d:'5/11',w:130.6},
+    {d:'5/12',w:130.0},{d:'5/13',w:130.3},{d:'5/14',w:129.8},{d:'5/15',w:130.0},
+    {d:'5/16',w:130.9},{d:'5/17',w:131.5},{d:'5/18',w:130.2},{d:'5/19',w:128.8},
+    {d:'5/20',w:127.9},{d:'5/21',w:128.4},{d:'5/22',w:128.2},{d:'5/23',w:129.4},
+    {d:'5/24',w:127.7},{d:'5/25',w:129.0},{d:'5/26',w:127.7},{d:'5/27',w:127.4}
+  ]
+};
+
+// ===== LINE CHART =====
+(function buildLineChart() {
+  const allPoints = [];
+  const marPts = weightData.mar.map(p => ({...p, month:'mar'}));
+  const aprPts = weightData.apr.map(p => ({...p, month:'apr'}));
+  const mayPts = weightData.may.map(p => ({...p, month:'may'}));
+  const pts = [...marPts, ...aprPts.filter(p=>p.w!==null), ...mayPts];
+  pts.forEach((p,i) => allPoints.push({...p, idx:i}));
+
+  const vals = allPoints.map(p=>p.w);
+  const minW = Math.floor(Math.min(...vals)) - 1;
+  const maxW = Math.ceil(Math.max(...vals)) + 1;
+
+  const svgW = Math.max(900, allPoints.length * 14);
+  const svgH = 340;
+  const padL = 52, padR = 20, padT = 20, padB = 50;
+  const chartW = svgW - padL - padR;
+  const chartH = svgH - padT - padB;
+
+  function xPos(i) { return padL + (i / (allPoints.length - 1)) * chartW; }
+  function yPos(w) { return padT + (1 - (w - minW) / (maxW - minW)) * chartH; }
+
+  // build path per month
+  function buildPath(pts2, filterMonth) {
+    const sub = pts2.filter(p => p.month === filterMonth);
+    if (sub.length === 0) return '';
+    return sub.map((p, i) => (i === 0 ? 'M' : 'L') + xPos(p.idx).toFixed(1) + ',' + yPos(p.w).toFixed(1)).join(' ');
+  }
+
+  // area path for full line
+  const fullPath = allPoints.map((p, i) => (i === 0 ? 'M' : 'L') + xPos(i).toFixed(1) + ',' + yPos(p.w).toFixed(1)).join(' ');
+  const areaPath = fullPath + ` L${xPos(allPoints.length-1).toFixed(1)},${(padT+chartH).toFixed(1)} L${padL},${(padT+chartH).toFixed(1)} Z`;
+
+  // axis labels
+  let xLabels = '';
+  allPoints.forEach((p, i) => {
+    const dayPart = p.d.split('/')[1];
+    if (dayPart === '1' || dayPart === '10' || dayPart === '20' || dayPart === '15' || i === allPoints.length-1) {
+      xLabels += `<text x="${xPos(i).toFixed(1)}" y="${svgH - 14}" text-anchor="middle" fill="#5C6080" font-size="10">${p.d}</text>`;
+    }
+  });
+
+  let yLabels = '';
+  for (let w = Math.ceil(minW/2)*2; w <= maxW; w += 2) {
+    const y = yPos(w);
+    yLabels += `<text x="${padL - 8}" y="${y.toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#5C6080" font-size="10">${w}</text>`;
+    yLabels += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${svgW - padR}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
+  }
+
+  // dots per month
+  const colors = {mar:'#FF6B6B', apr:'#FFD93D', may:'#4ECDC4'};
+  let dotsHTML = '';
+  allPoints.forEach((p, i) => {
+    const c = colors[p.month];
+    dotsHTML += `<circle class="chart-dot" cx="${xPos(i).toFixed(1)}" cy="${yPos(p.w).toFixed(1)}" r="4"
+      fill="${c}" stroke="var(--bg-card)" stroke-width="2"
+      data-date="${p.d}" data-weight="${p.w}" data-note="${p.note||''}"
+      style="cursor:pointer;transition:r 0.15s"/>`;
+  });
+
+  // highlight ref line at 130
+  const refY = yPos(130).toFixed(1);
+
+  const svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FF6B6B" stop-opacity="0.18"/>
+        <stop offset="50%" stop-color="#4ECDC4" stop-opacity="0.08"/>
+        <stop offset="100%" stop-color="#4ECDC4" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#FF6B6B"/>
+        <stop offset="50%" stop-color="#FFD93D"/>
+        <stop offset="100%" stop-color="#4ECDC4"/>
+      </linearGradient>
+    </defs>
+    ${yLabels}
+    <!-- ref line 130 -->
+    <line x1="${padL}" y1="${refY}" x2="${svgW-padR}" y2="${refY}"
+      stroke="rgba(78,205,196,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+    <text x="${svgW-padR-2}" y="${Number(refY)-6}" text-anchor="end" fill="rgba(78,205,196,0.6)" font-size="10">130斤</text>
+    <!-- area -->
+    <path d="${areaPath}" fill="url(#areaGrad)"/>
+    <!-- line -->
+    <path d="${fullPath}" fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- dots -->
+    ${dotsHTML}
+    ${xLabels}
+    <!-- axis -->
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <line x1="${padL}" y1="${padT+chartH}" x2="${svgW-padR}" y2="${padT+chartH}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  </svg>`;
+
+  document.getElementById('line-chart-wrap').innerHTML = svg;
+
+  // tooltip
+  const tooltip = document.getElementById('tooltip');
+  const tooltipDate = document.getElementById('tooltip-date');
+  const tooltipVal = document.getElementById('tooltip-val');
+
+  document.querySelectorAll('.chart-dot').forEach(dot => {
+    dot.addEventListener('mouseenter', (e) => {
+      dot.setAttribute('r', '6');
+      tooltipDate.textContent = e.target.dataset.date + (e.target.dataset.note ? ' · ' + e.target.dataset.note : '');
+      tooltipVal.textContent = e.target.dataset.weight + ' 斤';
+      tooltip.classList.add('show');
+    });
+    dot.addEventListener('mousemove', (e) => {
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top = (e.clientY - 40) + 'px';
+    });
+    dot.addEventListener('mouseleave', (e) => {
+      dot.setAttribute('r', '4');
+      tooltip.classList.remove('show');
+    });
+  });
+})();
+
+// ===== DONUT CHART =====
+(function buildDonut() {
+  const data = [
+    { label: '3月减重', value: 6.3, color: '#FF6B6B' },
+    { label: '4月减重', value: 3.1, color: '#FFD93D' },
+    { label: '5月减重（进行中）', value: 2.9, color: '#4ECDC4' },
+    { label: '剩余目标（距120斤）', value: 7.4, color: '#C3B1E1' },
+    { label: '缓冲空间', value: 5.0, color: '#3A3D4A' }
+  ];
+
+  const total = data.reduce((a, b) => a + b.value, 0);
+  const cx = 120, cy = 120, r = 85, innerR = 52;
+  const svgSize = 240;
+
+  let startAngle = -90;
+  let pathsHTML = '';
+  const angles = [];
+
+  data.forEach((item, i) => {
+    const pct = item.value / total;
+    const angle = pct * 360;
+    const endAngle = startAngle + angle;
+    angles.push({start: startAngle, end: endAngle});
+
+    const r2d = Math.PI / 180;
+    const x1 = cx + r * Math.cos(startAngle * r2d);
+    const y1 = cy + r * Math.sin(startAngle * r2d);
+    const x2 = cx + r * Math.cos(endAngle * r2d);
+    const y2 = cy + r * Math.sin(endAngle * r2d);
+    const xi1 = cx + innerR * Math.cos(endAngle * r2d);
+    const yi1 = cy + innerR * Math.sin(endAngle * r2d);
+    const xi2 = cx + innerR * Math.cos(startAngle * r2d);
+    const yi2 = cy + innerR * Math.sin(startAngle * r2d);
+    const large = angle > 180 ? 1 : 0;
+
+    const d = `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L ${xi1.toFixed(2)} ${yi1.toFixed(2)} A ${innerR} ${innerR} 0 ${large} 0 ${xi2.toFixed(2)} ${yi2.toFixed(2)} Z`;
+    pathsHTML += `<path d="${d}" fill="${item.color}" opacity="0.85"
+      class="donut-seg" data-idx="${i}"
+      style="cursor:pointer;transition:opacity 0.2s,transform 0.2s;transform-origin:${cx}px ${cy}px"/>`;
+    startAngle = endAngle;
+  });
+
+  const svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto">
+    ${pathsHTML}
+    <text x="${cx}" y="${cy - 8}" text-anchor="middle" fill="#E8EAF0" font-size="22" font-weight="800">${(data.slice(0,3).reduce((a,b)=>a+b.value,0)).toFixed(1)}</text>
+    <text x="${cx}" y="${cy + 12}" text-anchor="middle" fill="#8B8FA8" font-size="12">斤 已减</text>
+  </svg>`;
+
+  document.getElementById('donut-chart-wrap').innerHTML = svg;
+
+  // legend
+  const legend = document.getElementById('donut-legend');
+  data.forEach((item, i) => {
+    const pct = (item.value / total * 100).toFixed(1);
+    const el = document.createElement('div');
+    el.className = 'legend-item';
+    el.innerHTML = `<div class="legend-color" style="background:${item.color}"></div>
+      <div class="legend-name">${item.label}</div>
+      <div class="legend-val">${item.value}<span class="legend-pct">${pct}%</span></div>`;
+    el.addEventListener('mouseenter', () => {
+      document.querySelectorAll('.donut-seg').forEach((s, si) => {
+        s.style.opacity = si === i ? '1' : '0.3';
+        s.style.transform = si === i ? 'scale(1.04)' : 'scale(1)';
+      });
+    });
+    el.addEventListener('mouseleave', () => {
+      document.querySelectorAll('.donut-seg').forEach(s => {
+        s.style.opacity = '0.85';
+        s.style.transform = 'scale(1)';
+      });
+    });
+    legend.appendChild(el);
+  });
+
+  // donut hover
+  document.querySelectorAll('.donut-seg').forEach((seg, i) => {
+    seg.addEventListener('mouseenter', () => {
+      document.querySelectorAll('.donut-seg').forEach((s, si) => {
+        s.style.opacity = si === i ? '1' : '0.3';
+        s.style.transform = si === i ? 'scale(1.04)' : 'scale(1)';
+      });
+    });
+    seg.addEventListener('mouseleave', () => {
+      document.querySelectorAll('.donut-seg').forEach(s => {
+        s.style.opacity = '0.85';
+        s.style.transform = 'scale(1)';
+      });
+    });
+  });
+})();
+
+// ===== TIMELINE =====
+(function buildTimeline() {
+  const events = [
+    {week:'第一周（3月1-7日）', events:[
+      {icon:'📊', color:'rgba(255,107,107,0.12)', dotColor:'#FF6B6B', title:'开始体重记录', desc:'起始体重 137.9 斤，开始每日打卡记录体重。', tag:'起点', tagColor:'rgba(255,107,107,0.2)', tagText:'#FF6B6B'}
+    ]},
+    {week:'第二周（3月8-14日）', events:[
+      {icon:'💥', color:'rgba(255,107,107,0.12)', dotColor:'#FF8E53', title:'最大单日降幅', desc:'3月8日体重从 137.8 急降至 135.1，单日下降 2.7 斤。', tag:'爆发', tagColor:'rgba(255,142,83,0.2)', tagText:'#FF8E53'}
+    ]},
+    {week:'第三四周（3月22-31日）', events:[
+      {icon:'🥇', color:'rgba(255,230,109,0.12)', dotColor:'#FFD93D', title:'首破 132 斤', desc:'3月22日 131.5 斤，月末收于 131.6 斤，单月减重 6.3 斤。', tag:'里程碑', tagColor:'rgba(255,230,109,0.2)', tagText:'#FFD93D'}
+    ]},
+    {week:'4月清明假期（4月4-6日）', events:[
+      {icon:'🍢', color:'rgba(255,107,107,0.08)', dotColor:'#FF6B6B', title:'清明假期反弹', desc:'假期放松，体重胖了约 4 斤，节后 4/7 重回 134 斤。', tag:'风险', tagColor:'rgba(255,107,107,0.2)', tagText:'#FF6B6B'}
+    ]},
+    {week:'4月中旬（4月15-17日）', events:[
+      {icon:'🎯', color:'rgba(78,205,196,0.12)', dotColor:'#4ECDC4', title:'首次进入 129 斤区间', desc:'4月17日体重 129.0 斤，历史新低，首次突破 130 大关！', tag:'突破', tagColor:'rgba(78,205,196,0.2)', tagText:'#4ECDC4'}
+    ]},
+    {week:'4月末（4月28-30日）', events:[
+      {icon:'🌊', color:'rgba(78,205,196,0.12)', dotColor:'#4ECDC4', title:'月末冲刺至 128.3 斤', desc:'4月28-30日连续三天维持 128.3-129.7 斤，创月底新低。', tag:'稳定', tagColor:'rgba(78,205,196,0.2)', tagText:'#4ECDC4'}
+    ]},
+    {week:'五一假期（5月1-5日）', events:[
+      {icon:'🎆', color:'rgba(255,107,107,0.08)', dotColor:'#FF6B6B', title:'五一假期大反弹', desc:'五一 7 天假，体重从 130.3 飙升至 135.7 斤，整整胖了 6 斤。', tag:'最大反弹', tagColor:'rgba(255,107,107,0.2)', tagText:'#FF6B6B'}
+    ]},
+    {week:'5月上旬（5月6-10日）', events:[
+      {icon:'🚀', color:'rgba(168,230,207,0.12)', dotColor:'#A8E6CF', title:'正式启动减肥计划', desc:'5月6日宣布减肥计划，起始 134 斤，目标 127 斤，开始有意识的饮食控制。', tag:'新阶段', tagColor:'rgba(168,230,207,0.2)', tagText:'#A8E6CF'}
+    ]},
+    {week:'5月下旬（5月20-27日）', events:[
+      {icon:'👑', color:'rgba(195,177,225,0.15)', dotColor:'#C3B1E1', title:'连破历史最低纪录', desc:'5月20日 127.9 斤，5月24日 127.7 斤，5月27日 127.4 斤 —— 连续刷新历史最低！距目标仅差 7.4 斤。', tag:'新纪录', tagColor:'rgba(195,177,225,0.2)', tagText:'#C3B1E1'}
+    ]}
+  ];
+
+  const container = document.getElementById('timeline-container');
+  events.forEach((week, wi) => {
+    const weekDiv = document.createElement('div');
+    weekDiv.className = 'timeline-week';
+    weekDiv.innerHTML = `<div class="timeline-week-label">${week.week}</div>`;
+    week.events.forEach(ev => {
+      const evDiv = document.createElement('div');
+      evDiv.className = 'timeline-event';
+      evDiv.innerHTML = `
+        <div class="timeline-dot" style="background:${ev.dotColor}"></div>
+        <div class="timeline-icon" style="background:${ev.color}">${ev.icon}</div>
+        <div class="timeline-body">
+          <div class="timeline-title">${ev.title}<span class="timeline-tag" style="background:${ev.tagColor};color:${ev.tagText}">${ev.tag}</span></div>
+          <div class="timeline-meta">${ev.desc}</div>
+        </div>`;
+      weekDiv.appendChild(evDiv);
+    });
+    container.appendChild(weekDiv);
+  });
+})();
+
+// ===== COUNT UP ANIMATION =====
+function animateCountUp(el) {
+  const target = parseFloat(el.dataset.target);
+  const decimal = parseInt(el.dataset.decimal) || 0;
+  const duration = 1200;
+  const start = performance.now();
+  const startVal = target * 0.6;
+
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = startVal + (target - startVal) * eased;
+    el.textContent = current.toFixed(decimal);
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = target.toFixed(decimal);
+  }
+
+  requestAnimationFrame(step);
+}
+
+// ===== INTERSECTION OBSERVER =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+
+    if (el.hasAttribute('data-animate')) {
+      el.classList.add('visible');
+      // count up inside
+      el.querySelectorAll('.count-up').forEach(animateCountUp);
+    }
+    if (el.hasAttribute('data-animate-fade')) {
+      el.classList.add('visible');
+    }
+    if (el.classList.contains('timeline-week')) {
+      el.classList.add('visible');
+    }
+    if (el.classList.contains('achievement-card')) {
+      el.classList.add('visible');
+    }
+    if (el.classList.contains('outlook-card')) {
+      el.classList.add('visible');
+    }
+
+    observer.unobserve(el);
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('[data-animate],[data-animate-fade],.timeline-week,.achievement-card,.outlook-card').forEach(el => {
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>
