@@ -102,26 +102,27 @@
             width: 100%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             animation: headerFadeIn 0.8s cubic-bezier(0.25,0.1,0.25,1) both;
             position: absolute;
             top: 0;
             left: 0;
         }
 
-        /* ===== 图标样式（调整为靠上中间+放大） ===== */
+        /* ===== 图标样式（修正偏右问题：靠上中间+放大+居中修正） ===== */
         .logo-container {
             position: absolute;
             top: -80px; /* 向上调整位置，更靠上 */
-            left: 40%;
-            transform: translateX(-50%);
+            left: 45%;
+            /* 关键修正：向左偏移10px，解决视觉偏右问题 */
+            transform: translateX(calc(-50% - 10px));
             z-index: 2;
             animation: headerFadeIn 0.8s cubic-bezier(0.25,0.1,0.25,1) both;
         }
 
         .logo-icon {
-            width: 120px; /* 放大尺寸，原56px */
-            height: 120px; /* 放大尺寸，原56px */
+            width: 100px; /* 放大尺寸，原56px */
+            height: 100px; /* 放大尺寸，原56px */
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -391,7 +392,7 @@
             transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
         }
 
-        /* ===== 按钮 — Apple风格 ===== */
+        /* ===== 按钮 — Apple风格（修复扁长问题） ===== */
         .btn-group {
             display: flex;
             gap: 12px;
@@ -447,7 +448,8 @@
             color: var(--accent);
             border: 1.5px solid var(--accent);
             box-shadow: none;
-            flex: 0.5;
+            /* 关键：移除 flex:0.5，改为和主按钮一样 flex:1，避免宽度不均 */
+            flex: 1;
             transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.15s ease;
         }
 
@@ -507,17 +509,34 @@
             animation: contentIn 0.35s cubic-bezier(0.25,0.1,0.25,1) both;
         }
 
-        /* ===== 响应式 ===== */
+        /* ===== 响应式（全面修复移动端问题） ===== */
         @media (max-width: 520px) {
             body { padding: 16px; }
             .card { padding: 28px 20px; border-radius: 16px; }
             .sentence { font-size: 19px; }
             .header h1 { font-size: 28px; }
-            .btn { height: 48px; font-size: 15px; border-radius: 12px; }
-            .btn-group { flex-direction: column; }
+            
+            /* 按钮组关键修复：手机端垂直排列，解决扁长问题 */
+            .btn-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .btn { 
+                height: 48px; 
+                font-size: 15px; 
+                border-radius: 12px;
+                padding: 0 16px;
+            }
             .btn-secondary { flex: 1; }
-            .logo-icon { width: 80px; height: 80px; } /* 移动端适配放大尺寸 */
-            .logo-container { top: -60px; } /* 移动端调整顶部位置 */
+            
+            /* 移动端图标修正：尺寸和位置 */
+            .logo-icon { width: 80px; height: 80px; }
+            .logo-container { 
+                top: -60px; 
+                /* 移动端同步修正偏右问题 */
+                transform: translateX(calc(-50% - 8px));
+            }
+            
             .toggle-label { display: none; }
             .top-bar { padding: 0 2px; }
             .header { margin-top: 20px; }
@@ -567,7 +586,7 @@
 <body>
 
     <div class="container">
-        <!-- 独立的Logo容器（靠上中间） -->
+        <!-- 独立的Logo容器（靠上中间+修正偏右+放大） -->
         <div class="logo-container">
             <div class="logo-icon" aria-label="图标" role="img">
                 <img src="https://bee-reg-ab.imagency.cn/e/b47e37c6ae72098bcc3e7d742c8daed1.png" alt="中指" />
@@ -576,7 +595,6 @@
 
         <!-- Top Bar: 仅保留主题切换（Logo已移出） -->
         <div class="top-bar">
-            <div style="flex: 1;"></div> <!-- 占位 -->
             <!-- Apple 风格滑块切换 -->
             <label class="theme-toggle" id="themeToggle">
                 <span class="toggle-label" id="toggleLabel">深色模式</span>
@@ -601,7 +619,7 @@
             <div class="divider"></div>
             <div class="meta">
                 <span>火力全开 · 持续输出</span>
-                <span class="count-badge" id="countBadge">共 114 条</span>
+                <span class="count-badge" id="countBadge">共 1069 条</span>
             </div>
         </div>
 
@@ -622,9 +640,8 @@
 
         <!-- Footer -->
         <footer class="footer">
-            FxxK 🍎 Anyone
+            Designed with 🍎 Apple Style
         </footer>
-
     </div>
 
     <script>
@@ -1758,7 +1775,7 @@
             "长大了，你要当傻逼潜水员，你爷你奶可高兴了，拿着棒球棍打爆你的屁眼，之后把你扔到海里，顿时蓝蓝的大海瞬间变成了臭水沟，把鱼都熏死了，有一条鲨鱼向你游过来，猛地咬断了你的生殖器，从此以后你不孕不育，最后你为了逃离鲨鱼的追击，拼命的挥动双手向岸边游，前面又出现了一堆鳄鱼，扑到你旁边咬掉了你的双手双脚，之后你再也动不了了，只好把身体向海的深处游，游着游着，来了一群水母疯狂的蜇你，把你蜇的鼻青脸肿的",
             "操你妈，老子拿一盆硫酸直接撒到你妈的阴道里，然后疼得你妈嗷嗷的叫，我去你妈了个逼，再叫一声，老子直接把你妈的阴道用棍子捅成两半，操你妈的逼，老子直接用手伸进你妈的阴道里，用力的向两边撕，然后你妈的逼就变成两半了，之后再把你妈的乳房用刀砍下来，挂到房顶上，接下来把你妈的胳膊和双腿锯下来，剁碎包饺子，煮熟了，拿去喂狗，然后狗吃完了再拉出来就变成屎，最后用来给地里当肥料",
             "老子正在用鸡巴操着你妈，一共出了五件装备，第一件，暗影战斧，作用:提升生殖器的威力，操起你妈会对你妈造成高额伤害，第二件，破军，作用:增加180点物理伤害，操一下你妈就掉一百多滴血，第三件，蓝宝石，作用:增加300法力，因为使用技能操你妈会消耗法力，第四件，泣血之刃，作用:操你妈的时候会射出很多精子，出了这件装备一边操你妈一边回百分之二十五精子，最后一件，纯净苍穹，作用:提升攻速加暴击",
-            "我把你妈逼一键删除，怎么还是生出了你"            
+            "我把你妈逼一键删除，怎么还是生出了你"         
         ];
 
         const $ = id => document.getElementById(id);
