@@ -109,28 +109,26 @@
             left: 0;
         }
 
-        /* ===== 图标样式（修正偏右问题：靠上中间+放大+居中修正） ===== */
+        /* ===== 图标样式（修正偏右 + 放大） ===== */
         .logo-container {
             position: absolute;
-            top: -80px; /* 向上调整位置，更靠上 */
+            top: -80px;
             left: 40%;
-            /* 关键修正：向左偏移10px，解决视觉偏右问题 */
             transform: translateX(calc(-50% - 10px));
             z-index: 2;
             animation: headerFadeIn 0.8s cubic-bezier(0.25,0.1,0.25,1) both;
         }
 
         .logo-icon {
-            width: 100px; /* 放大尺寸，原56px */
-            height: 100px; /* 放大尺寸，原56px */
+            width: 100px;
+            height: 100px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: filter 0.3s ease; /* 增加过渡效果 */
+            transition: filter 0.3s ease;
         }
 
-        /* 深色模式对PNG图片进行反色处理，以保证可读性 */
         body.dark .logo-icon {
             filter: invert(1) brightness(0.9);
         }
@@ -203,7 +201,6 @@
             pointer-events: none;
         }
 
-        /* 滑块圆形 */
         .toggle-thumb {
             position: absolute;
             top: 3px;
@@ -217,7 +214,6 @@
             z-index: 2;
         }
 
-        /* 勾选状态（暗色模式开启） */
         .theme-toggle input:checked + .toggle-track {
             background: var(--accent);
         }
@@ -234,7 +230,6 @@
             transform: translateX(18px);
         }
 
-        /* 聚焦态 */
         .theme-toggle input:focus-visible + .toggle-track {
             outline: 2px solid var(--accent);
             outline-offset: 3px;
@@ -257,7 +252,7 @@
             align-items: center;
             gap: 10px;
             animation: headerFadeIn 0.8s cubic-bezier(0.25,0.1,0.25,1) both;
-            margin-top: 40px; /* 给顶部图标留出空间 */
+            margin-top: 40px;
         }
 
         .header h1 {
@@ -392,7 +387,7 @@
             transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
         }
 
-        /* ===== 按钮 — Apple风格（修复扁长问题） ===== */
+        /* ===== 按钮基础样式（桌面端） ===== */
         .btn-group {
             display: flex;
             gap: 12px;
@@ -418,6 +413,9 @@
             user-select: none;
             position: relative;
             overflow: hidden;
+            /* 基础兜底：保证最小触控尺寸 */
+            min-height: 44px;
+            min-width: 44px;
         }
 
         .btn:active {
@@ -448,7 +446,6 @@
             color: var(--accent);
             border: 1.5px solid var(--accent);
             box-shadow: none;
-            /* 关键：移除 flex:0.5，改为和主按钮一样 flex:1，避免宽度不均 */
             flex: 1;
             transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.15s ease;
         }
@@ -497,7 +494,7 @@
 
         @keyframes cardSlideUp {
             from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(24px); }
         }
 
         @keyframes contentIn {
@@ -507,39 +504,6 @@
 
         .content-enter {
             animation: contentIn 0.35s cubic-bezier(0.25,0.1,0.25,1) both;
-        }
-
-        /* ===== 响应式（全面修复移动端问题） ===== */
-        @media (max-width: 520px) {
-            body { padding: 16px; }
-            .card { padding: 28px 20px; border-radius: 16px; }
-            .sentence { font-size: 19px; }
-            .header h1 { font-size: 28px; }
-            
-            /* 按钮组关键修复：手机端垂直排列，解决扁长问题 */
-            .btn-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .btn { 
-                height: 48px; 
-                font-size: 15px; 
-                border-radius: 12px;
-                padding: 0 16px;
-            }
-            .btn-secondary { flex: 1; }
-            
-            /* 移动端图标修正：尺寸和位置 */
-            .logo-icon { width: 80px; height: 80px; }
-            .logo-container { 
-                top: -60px; 
-                /* 移动端同步修正偏右问题 */
-                transform: translateX(calc(-50% - 8px));
-            }
-            
-            .toggle-label { display: none; }
-            .top-bar { padding: 0 2px; }
-            .header { margin-top: 20px; }
         }
 
         /* ===== 键盘快捷键提示 ===== */
@@ -581,6 +545,42 @@
         .shake {
             animation: shake 0.4s ease;
         }
+
+        /* ===================== 移动端核心修复（手机按钮扁/窄专用） ===================== */
+        @media (max-width: 520px) {
+            body { padding: 16px; }
+            .card { padding: 28px 20px; border-radius: 16px; }
+            .sentence { font-size: 19px; }
+            .header h1 { font-size: 28px; }
+
+            /* 按钮组：垂直排列，增加上下间距 */
+            .btn-group {
+                flex-direction: column;
+                gap: 14px; /* 加大按钮之间间距，避免拥挤 */
+            }
+
+            /* 【重点修复】手机按钮：加高高度 + 加大上下内边距，彻底解决扁、窄 */
+            .btn {
+                height: 56px; /* 提高高度，视觉不扁 */
+                padding: 14px 20px; /* 上下内边距撑开高度，左右撑开宽度 */
+                font-size: 16px; /* 字号保持舒适 */
+                border-radius: 12px;
+                /* 强制最小尺寸，符合移动端触控标准 44*44px */
+                min-height: 52px;
+                min-width: 100%; /* 手机端按钮铺满整行，解决“窄”问题 */
+            }
+
+            /* 移动端图标适配 */
+            .logo-icon { width: 80px; height: 80px; }
+            .logo-container {
+                top: -60px;
+                transform: translateX(calc(-50% - 8px));
+            }
+
+            .toggle-label { display: none; }
+            .top-bar { padding: 0 2px; }
+            .header { margin-top: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -589,13 +589,12 @@
         <!-- 独立的Logo容器（靠上中间+修正偏右+放大） -->
         <div class="logo-container">
             <div class="logo-icon" aria-label="图标" role="img">
-                <img src="https://bee-reg-ab.imagency.cn/e/b47e37c6ae72098bcc3e7d742c8daed1.png" alt="中指" />
+                <img src="https://bee-reg-ab.imagency.cn/e/b47e37c6ae72098bcc3e7d742c8daed1.png" alt="图标" />
             </div>
         </div>
 
-        <!-- Top Bar: 仅保留主题切换（Logo已移出） -->
+        <!-- Top Bar: 仅保留主题切换 -->
         <div class="top-bar">
-            <!-- Apple 风格滑块切换 -->
             <label class="theme-toggle" id="themeToggle">
                 <span class="toggle-label" id="toggleLabel">深色模式</span>
                 <input type="checkbox" id="themeCheckbox" aria-label="切换深色/浅色模式">
@@ -650,7 +649,6 @@
         const toggleLabel = document.getElementById('toggleLabel');
         const STORAGE_KEY = 'fuck-gen-theme';
 
-        // 初始化：优先读取本地存储，其次跟随系统
         function initTheme() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved === 'dark') {
@@ -662,7 +660,6 @@
                 checkbox.checked = false;
                 toggleLabel.textContent = '深色模式';
             } else {
-                // 跟随系统
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 if (prefersDark) {
                     document.body.classList.add('dark');
@@ -677,7 +674,6 @@
             refreshAccentColors();
         }
 
-        // 切换主题
         function toggleTheme(e) {
             const isDark = e.target.checked;
             if (isDark) {
@@ -692,9 +688,7 @@
             refreshAccentColors();
         }
 
-        // 因为 SVG 用了 CSS 变量作 stroke，body class 切换后自动生效，无需额外操作
         function refreshAccentColors() {
-            // 触发 SVG 重绘（浏览器通常会自动处理 CSS 变量变化）
             const svg = document.querySelector('.logo-icon svg');
             if (svg) {
                 svg.style.display = 'none';
@@ -1775,7 +1769,7 @@
             "长大了，你要当傻逼潜水员，你爷你奶可高兴了，拿着棒球棍打爆你的屁眼，之后把你扔到海里，顿时蓝蓝的大海瞬间变成了臭水沟，把鱼都熏死了，有一条鲨鱼向你游过来，猛地咬断了你的生殖器，从此以后你不孕不育，最后你为了逃离鲨鱼的追击，拼命的挥动双手向岸边游，前面又出现了一堆鳄鱼，扑到你旁边咬掉了你的双手双脚，之后你再也动不了了，只好把身体向海的深处游，游着游着，来了一群水母疯狂的蜇你，把你蜇的鼻青脸肿的",
             "操你妈，老子拿一盆硫酸直接撒到你妈的阴道里，然后疼得你妈嗷嗷的叫，我去你妈了个逼，再叫一声，老子直接把你妈的阴道用棍子捅成两半，操你妈的逼，老子直接用手伸进你妈的阴道里，用力的向两边撕，然后你妈的逼就变成两半了，之后再把你妈的乳房用刀砍下来，挂到房顶上，接下来把你妈的胳膊和双腿锯下来，剁碎包饺子，煮熟了，拿去喂狗，然后狗吃完了再拉出来就变成屎，最后用来给地里当肥料",
             "老子正在用鸡巴操着你妈，一共出了五件装备，第一件，暗影战斧，作用:提升生殖器的威力，操起你妈会对你妈造成高额伤害，第二件，破军，作用:增加180点物理伤害，操一下你妈就掉一百多滴血，第三件，蓝宝石，作用:增加300法力，因为使用技能操你妈会消耗法力，第四件，泣血之刃，作用:操你妈的时候会射出很多精子，出了这件装备一边操你妈一边回百分之二十五精子，最后一件，纯净苍穹，作用:提升攻速加暴击",
-            "我把你妈逼一键删除，怎么还是生出了你"         
+            "我把你妈逼一键删除，怎么还是生出了你" 
         ];
 
         const $ = id => document.getElementById(id);
